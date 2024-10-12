@@ -5,7 +5,6 @@ class QueryExecutor:
     def execute_query(self, query, limit=None, offset=None):
         if self.connection and query:
             paginated_query = query
-            print(f"before: {paginated_query}")
             if limit is not None and offset is not None:
                 paginated_query += f" LIMIT {limit} OFFSET {offset}"
 
