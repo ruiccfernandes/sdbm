@@ -90,6 +90,9 @@ class MainWindow(QMainWindow):
         # Header click detection for sorting
         self.results_table.horizontalHeader().sectionClicked.connect(self.on_header_click)
 
+        # Enable Column Resizing
+        self.results_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+
         right_panel.setLayout(right_layout)
 
         # Add the left and right panels to the splitter
