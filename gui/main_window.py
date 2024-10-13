@@ -229,7 +229,10 @@ class MainWindow(QMainWindow):
         self.results_table.setSortingEnabled(False)
 
         # Sort the local data
-        self.local_data.sort(key=lambda x: x[self.current_sort_column], reverse=self.current_sort_order == Qt.DescendingOrder)
+        self.local_data.sort(
+            key=lambda x: ('' if x[self.current_sort_column] is None else x[self.current_sort_column]),
+            reverse=self.current_sort_order == Qt.DescendingOrder
+        )
 
         # Clear the model and repopulate it with sorted data
         self.model.setRowCount(0)  # Clear the model
