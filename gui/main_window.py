@@ -36,6 +36,9 @@ class MainWindow(QMainWindow):
         self.password_input = QLineEdit()
         self.database_input = QLineEdit()
 
+        # Hide password
+        self.password_input.setEchoMode(QLineEdit.Password)
+
         self.host_input.setPlaceholderText("Host")
         self.user_input.setPlaceholderText("User")
         self.password_input.setPlaceholderText("Password")
