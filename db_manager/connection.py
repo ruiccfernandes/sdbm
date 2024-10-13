@@ -6,6 +6,7 @@ class DatabaseConnection:
         self.connection = None
 
     def connect(self, host, user, password, database):
+        print(host, user, password, database)
         try:
             self.connection = mysql.connector.connect(
                 host=host,
@@ -14,6 +15,7 @@ class DatabaseConnection:
                 database=database
             )
             if self.connection.is_connected():
+                print("Connected to MySQL database")
                 return True
         except Error as e:
             print(f"Error: {e}")

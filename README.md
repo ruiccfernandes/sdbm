@@ -1,5 +1,5 @@
 # sdbm
-Simple Database Management
+Simple Database Manager
 
 This is a database management software built with PySide6 for managing MySQL databases.
 
@@ -13,4 +13,4 @@ This is a database management software built with PySide6 for managing MySQL dat
 1. Clone the repository:
    ```bash
    git clone https://github.com/ruiccfernandes/sdbm.git
-   cd simple_database_management
+   cd simple_database_manager

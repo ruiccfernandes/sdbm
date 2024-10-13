@@ -1,5 +1,5 @@
 import re
-from PySide6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout, QWidget, QTextEdit, QTableView, QHeaderView
+from PySide6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout, QWidget, QTextEdit, QTableView, QHeaderView, QSplitter, QLabel, QLineEdit, QListWidget, QHBoxLayout
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtCore import Qt
 from db_manager.connection import DatabaseConnection
@@ -17,29 +17,64 @@ class MainWindow(QMainWindow):
         self.all_records_loaded = False  # To check if all records are loaded
         self.current_sort_column = -1
         self.current_sort_order = Qt.AscendingOrder
-
-        # Maintain a local list to hold fetched data for sorting
-        self.local_data = []
+        self.local_data = []  # Local storage for data
 
         # Setup UI
-        self.setWindowTitle("Database Manager")
-        self.setGeometry(100, 100, 800, 600)
+        self.setWindowTitle("Simple Database Manager")
+        self.setGeometry(100, 100, 1000, 600)
 
-        # Main layout
-        layout = QVBoxLayout()
+        # Create a QSplitter to divide the window into two resizable sections (left and right)
+        splitter = QSplitter(Qt.Horizontal)
+
+        # Left panel: Database connection and table listing
+        left_panel = QWidget()
+        left_layout = QVBoxLayout()
+
+        # Connection settings (just placeholders)
+        self.host_input = QLineEdit()
+        self.user_input = QLineEdit()
+        self.password_input = QLineEdit()
+        self.database_input = QLineEdit()
+
+        self.host_input.setPlaceholderText("Host")
+        self.user_input.setPlaceholderText("User")
+        self.password_input.setPlaceholderText("Password")
+        self.database_input.setPlaceholderText("Database")
+
+        self.connect_button = QPushButton("Connect")
+        self.connect_button.clicked.connect(self.connect_to_database)
+
+        left_layout.addWidget(QLabel("Database Connection"))
+        left_layout.addWidget(self.host_input)
+        left_layout.addWidget(self.user_input)
+        left_layout.addWidget(self.password_input)
+        left_layout.addWidget(self.database_input)
+        left_layout.addWidget(self.connect_button)
+
+        # Table listing
+        self.tables_list = QListWidget()
+        self.tables_list.itemClicked.connect(self.table_selected)
+        left_layout.addWidget(QLabel("Tables"))
+        left_layout.addWidget(self.tables_list)
+
+        left_panel.setLayout(left_layout)
+
+        # Right panel: Query editor and results display
+        right_panel = QWidget()
+        right_layout = QVBoxLayout()
 
         # SQL Query input
         self.query_text = QTextEdit()
-        layout.addWidget(self.query_text)
+        right_layout.addWidget(self.query_text)
 
         # Execute Query Button
         self.execute_button = QPushButton("Execute Query")
         self.execute_button.clicked.connect(self.execute_query)
-        layout.addWidget(self.execute_button)
+        right_layout.addWidget(self.execute_button)
 
-        # Table for displaying results (QTableView with sorting and lazy loading)
+        # Table for displaying results
         self.results_table = QTableView()
-        layout.addWidget(self.results_table)
+        right_layout.addWidget(self.results_table)
 
         # Model for displaying data
         self.model = QStandardItemModel(self)
@@ -52,15 +87,46 @@ class MainWindow(QMainWindow):
         # Header click detection for sorting
         self.results_table.horizontalHeader().sectionClicked.connect(self.on_header_click)
 
-        # Main widget container
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
+        right_panel.setLayout(right_layout)
 
-        # Database connection
+        # Add the left and right panels to the splitter
+        splitter.addWidget(left_panel)
+        splitter.addWidget(right_panel)
+        splitter.setSizes([200, 800])  # Set initial sizes
+
+        # Set the splitter as the central widget
+        self.setCentralWidget(splitter)
+
+        # Initialize the DatabaseConnection object (to be set later)
+        self.db_connection = None
+        self.query_executor = None
+
+    def connect_to_database(self):
+        """Connect to the database using user input and populate the table list."""
+        host = self.host_input.text()
+        user = self.user_input.text()
+        password = self.password_input.text()
+        database = self.database_input.text()
+
+        # Establish the connection
         self.db_connection = DatabaseConnection()
-        self.db_connection.connect(host="localhost", user="root", password="yourpassword", database="yourdatabase")
+        self.db_connection.connect(host=host, user=user, password=password, database=database)
         self.query_executor = QueryExecutor(self.db_connection.connection)
+
+        # Get the list of tables
+        query = (f"SELECT table_name FROM information_schema.tables WHERE table_schema = '{database}'")
+        result, _ = self.query_executor.execute_query(query)
+
+        # Populate the tables list
+        self.tables_list.clear()
+        if result:
+            for table in result:
+                self.tables_list.addItem(table[0])
+
+    def table_selected(self, item):
+        """Handle table selection from the list and display the selected table."""
+        table_name = item.text()
+        self.query_text.setText(f"SELECT * FROM {table_name}")
 
     def execute_query(self, append=False):
         """Execute query and load data into the table."""
