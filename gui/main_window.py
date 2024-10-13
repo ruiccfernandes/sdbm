@@ -133,6 +133,18 @@ class MainWindow(QMainWindow):
 
     def execute_query(self, append=False):
         """Execute query and load data into the table."""
+
+        # Reset the table and states before executing the query
+        if not append:
+            self.model.clear()  # Clear the current model (removes all rows and headers)
+            self.model.setRowCount(0)  # Reset the row count
+            self.local_data.clear()  # Clear the local data list
+            self.current_offset = 0  # Reset pagination offset
+            self.total_loaded = 0  # Reset the count of total loaded records
+            self.all_records_loaded = False  # Reset the "all records loaded" flag
+            self.current_sort_column = -1  # Reset sort column
+            self.current_sort_order = Qt.AscendingOrder  # Reset sort order
+
         query = self.query_text.toPlainText()
 
         # Extract LIMIT if present
@@ -150,7 +162,8 @@ class MainWindow(QMainWindow):
         effective_offset = self.current_offset if append else 0
 
         # Append LIMIT and OFFSET to the query for loading
-        limit_to_load = min(self.records_per_page, self.user_limit - self.total_loaded) if not append else self.records_per_page
+        limit_to_load = min(self.records_per_page,
+                            self.user_limit - self.total_loaded) if not append else self.records_per_page
         if limit_to_load > 0:  # Only load if there's still data to load
             query = f"{query} LIMIT {limit_to_load} OFFSET {effective_offset}"
 

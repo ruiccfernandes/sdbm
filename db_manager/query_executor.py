@@ -5,7 +5,6 @@ class QueryExecutor:
     def execute_query(self, query):
         if self.connection and query:
             cursor = self.connection.cursor()
-            print(query)
             try:
                 cursor.execute(query)
                 if query.strip().lower().startswith("select"):
