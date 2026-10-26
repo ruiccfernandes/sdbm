@@ -1,12 +1,14 @@
+"""Application entry point."""
+
 import sys
 from PySide6.QtWidgets import QApplication
 from gui.main_window import MainWindow
+from config import APP_STYLE
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-    # Set the application style
-    app.setStyle('Fusion')  # Set to Fusion style
+    app.setStyle(APP_STYLE)
 
     window = MainWindow()
     window.show()

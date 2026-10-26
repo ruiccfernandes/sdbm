@@ -16,10 +16,12 @@ class DatabaseConnection:
             if self.connection.is_connected():
                 print("Connected to MySQL database")
                 return True
+            return False
         except Error as e:
             print(f"Error: {e}")
+            self.connection = None
             return False
 
     def close(self):
-        if self.connection.is_connected():
+        if self.connection and self.connection.is_connected():
             self.connection.close()

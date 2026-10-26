@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(iconv -f UTF-16 -t UTF-8 /home/rui/Documents/projects/github/sdbm/requirements.txt)",
+      "Bash(python -m py_compile db_manager/connection.py db_manager/query_executor.py gui/main_window.py main.py)",
+      "Bash(xxd /home/rui/Documents/projects/github/sdbm/requirements.txt)",
+      "Bash(python *)",
+      "Bash(python3 *)"
+    ]
+  }
+}
